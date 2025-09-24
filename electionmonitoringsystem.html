@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Monitoring System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Inter font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-slow {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md">
+        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.022 12.022 0 0012 21.026a12.022 12.022 0 008.618-18.016z"></path></svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">Democra-Trac</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span id="live-indicator" class="flex items-center space-x-2 text-sm font-medium text-green-500">
+                    <span class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    <span>Live</span>
+                </span>
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0015.354 20.354z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- Card for Total Votes -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Votes Counted</p>
+                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c-2.485 1.625-2.529 1.625-5 0v-13c2.485-1.625 2.529-1.625 5 0m0 19v-13"></path></svg>
+                </div>
+                <p id="total-votes" class="text-4xl font-bold mt-2">0</p>
+            </div>
+            <!-- Card for Voter Turnout -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Voter Turnout</p>
+                    <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                </div>
+                <p id="voter-turnout" class="text-4xl font-bold mt-2">0%</p>
+            </div>
+            <!-- Card for Polling Stations Reported -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Polling Stations Reported</p>
+                    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </div>
+                <p id="stations-reported" class="text-4xl font-bold mt-2">0/5000</p>
+            </div>
+        </div>
+
+        <!-- Main Dashboard Section -->
+        <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Simulated Results by Candidate</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Candidate cards -->
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-inner">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-8 h-8 rounded-full bg-indigo-500"></span>
+                            <span class="text-lg font-medium">Candidate A</span>
+                        </div>
+                        <span id="votes-A" class="text-2xl font-bold">0</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-600">
+                        <div id="progress-A" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="percentage-A" class="text-sm text-gray-500 dark:text-gray-400 mt-2">0%</p>
+                </div>
+
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-inner">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-8 h-8 rounded-full bg-emerald-500"></span>
+                            <span class="text-lg font-medium">Candidate B</span>
+                        </div>
+                        <span id="votes-B" class="text-2xl font-bold">0</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-600">
+                        <div id="progress-B" class="bg-emerald-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="percentage-B" class="text-sm text-gray-500 dark:text-gray-400 mt-2">0%</p>
+                </div>
+
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-inner">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-8 h-8 rounded-full bg-yellow-500"></span>
+                            <span class="text-lg font-medium">Candidate C</span>
+                        </div>
+                        <span id="votes-C" class="text-2xl font-bold">0</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-600">
+                        <div id="progress-C" class="bg-yellow-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="percentage-C" class="text-sm text-gray-500 dark:text-gray-400 mt-2">0%</p>
+                </div>
+
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-inner">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-8 h-8 rounded-full bg-rose-500"></span>
+                            <span class="text-lg font-medium">Candidate D</span>
+                        </div>
+                        <span id="votes-D" class="text-2xl font-bold">0</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-600">
+                        <div id="progress-D" class="bg-rose-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="percentage-D" class="text-sm text-gray-500 dark:text-gray-400 mt-2">0%</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chart Section -->
+        <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Vote Distribution</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Pie Chart -->
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-medium text-gray-800 dark:text-gray-200 mb-2">Overall Results</h3>
+                    <canvas id="votePieChart"></canvas>
+                </div>
+                <!-- Bar Chart -->
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-medium text-gray-800 dark:text-gray-200 mb-2">Votes Over Time</h3>
+                    <canvas id="voteBarChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Incident Reporting Section -->
+        <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Report an Incident</h2>
+            <form id="incident-form" class="space-y-4">
+                <div>
+                    <label for="incident-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Type of Incident</label>
+                    <select id="incident-type" name="incident-type" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                        <option>Polling station issue</option>
+                        <option>Voter intimidation</option>
+                        <option>Misinformation</option>
+                        <option>Technical malfunction</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="incident-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                    <textarea id="incident-description" name="incident-description" rows="4" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></textarea>
+                </div>
+                <div>
+                    <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Location (City/State)</label>
+                    <input type="text" id="location" name="location" class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+                </div>
+                <button type="submit" class="w-full px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">Submit Report</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Modal for incident submission confirmation -->
+    <div id="success-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl p-6 w-full max-w-sm text-center">
+            <svg class="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <h3 class="text-2xl font-bold mb-2">Report Submitted!</h3>
+            <p class="text-gray-600 dark:text-gray-400 mb-4">Thank you for helping us monitor the election.</p>
+            <button id="close-modal" class="px-4 py-2 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors duration-200">Close</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-200 dark:bg-gray-800 mt-8 py-4 text-center text-gray-600 dark:text-gray-400">
+        <p>&copy; 2025 Democra-Trac. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const totalVotesEl = document.getElementById('total-votes');
+            const voterTurnoutEl = document.getElementById('voter-turnout');
+            const stationsReportedEl = document.getElementById('stations-reported');
+            const liveIndicator = document.getElementById('live-indicator');
+            const incidentForm = document.getElementById('incident-form');
+            const successModal = document.getElementById('success-modal');
+            const closeModalBtn = document.getElementById('close-modal');
+            const themeToggleBtn = document.getElementById('theme-toggle');
+
+            // Simulate data
+            let totalVotes = 0;
+            let totalPopulation = 100000;
+            let totalStations = 5000;
+            let stationsReported = 0;
+            const candidates = {
+                A: { votes: 0, color: 'rgb(99, 102, 241)' },
+                B: { votes: 0, color: 'rgb(16, 185, 129)' },
+                C: { votes: 0, color: 'rgb(245, 158, 11)' },
+                D: { votes: 0, color: 'rgb(244, 63, 94)' }
+            };
+            const voteData = {
+                labels: ['Candidate A', 'Candidate B', 'Candidate C', 'Candidate D'],
+                datasets: [{
+                    label: 'Votes',
+                    data: [0, 0, 0, 0],
+                    backgroundColor: [
+                        'rgb(99, 102, 241, 0.8)',
+                        'rgb(16, 185, 129, 0.8)',
+                        'rgb(245, 158, 11, 0.8)',
+                        'rgb(244, 63, 94, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgb(99, 102, 241)',
+                        'rgb(16, 185, 129)',
+                        'rgb(245, 158, 11)',
+                        'rgb(244, 63, 94)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            const timelineData = {
+                labels: [], // Time labels will be added dynamically
+                datasets: [{
+                    label: 'Total Votes',
+                    data: [],
+                    borderColor: 'rgb(99, 102, 241)',
+                    backgroundColor: 'rgba(99, 102, 241, 0.5)',
+                    tension: 0.1
+                }]
+            };
+
+            // Chart setup
+            const pieCtx = document.getElementById('votePieChart').getContext('2d');
+            const pieChart = new Chart(pieCtx, {
+                type: 'doughnut',
+                data: voteData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw.toLocaleString()} (${context.parsed}%)` } }
+                    }
+                }
+            });
+
+            const barCtx = document.getElementById('voteBarChart').getContext('2d');
+            const barChart = new Chart(barCtx, {
+                type: 'line',
+                data: timelineData,
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Update function
+            function updateData() {
+                const newVotes = Math.floor(Math.random() * 500) + 1;
+                const newStations = Math.floor(Math.random() * 50) + 1;
+
+                totalVotes += newVotes;
+                stationsReported = Math.min(totalStations, stationsReported + newStations);
+
+                // Distribute new votes randomly among candidates
+                for (let i = 0; i < newVotes; i++) {
+                    const candidateKeys = Object.keys(candidates);
+                    const randomCandidate = candidateKeys[Math.floor(Math.random() * candidateKeys.length)];
+                    candidates[randomCandidate].votes++;
+                }
+
+                // Update UI elements
+                totalVotesEl.textContent = totalVotes.toLocaleString();
+                const turnout = ((totalVotes / totalPopulation) * 100).toFixed(2);
+                voterTurnoutEl.textContent = `${turnout}%`;
+                stationsReportedEl.textContent = `${stationsReported.toLocaleString()}/${totalStations.toLocaleString()}`;
+
+                // Update candidate vote counts and percentages
+                Object.keys(candidates).forEach(key => {
+                    const candidate = candidates[key];
+                    const percentage = totalVotes > 0 ? ((candidate.votes / totalVotes) * 100) : 0;
+                    document.getElementById(`votes-${key}`).textContent = candidate.votes.toLocaleString();
+                    document.getElementById(`progress-${key}`).style.width = `${percentage.toFixed(2)}%`;
+                    document.getElementById(`percentage-${key}`).textContent = `${percentage.toFixed(2)}%`;
+                    voteData.datasets[0].data[voteData.labels.indexOf(`Candidate ${key}`)] = percentage.toFixed(2);
+                });
+
+                // Update charts
+                pieChart.update();
+
+                // Update timeline chart data
+                const now = new Date();
+                timelineData.labels.push(`${now.getHours()}:${String(now.getMinutes()).padStart(2, '0')}`);
+                timelineData.datasets[0].data.push(totalVotes);
+                if (timelineData.labels.length > 20) {
+                    timelineData.labels.shift();
+                    timelineData.datasets[0].data.shift();
+                }
+                barChart.update();
+            }
+
+            // Initial data load and then update every few seconds
+            updateData();
+            setInterval(updateData, 5000); // Update every 5 seconds
+
+            // Incident form submission handler
+            incidentForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Simulate form submission success
+                successModal.classList.remove('hidden');
+                incidentForm.reset();
+            });
+
+            // Modal close handler
+            closeModalBtn.addEventListener('click', () => {
+                successModal.classList.add('hidden');
+            });
+
+            // Dark mode toggle
+            themeToggleBtn.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+            });
+        });
+    </script>
+</body>
+</html>
